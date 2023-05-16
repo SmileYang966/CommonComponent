@@ -1,6 +1,6 @@
 import { Text, View, Pressable,StyleSheet, TouchableOpacity,Image } from 'react-native'
 import React, { Component } from 'react'
-import { showModel,dismissModel, showMultiPopupModelAndFindNext,dismissModelAndFindNext } from './component/ModelOperations';
+import { showMultiPopupModelAndFindNext,dismissModelAndFindNext } from './component/ModelOperations';
 import warningPopUp from '../images/warning.png'
 
 
