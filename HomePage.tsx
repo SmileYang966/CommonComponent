@@ -41,6 +41,9 @@ export default class HomePage extends Component {
       case 1:
         navigation.push("MultiDialogScreen")
         break;
+      case 2:
+          navigation.push("AxiosRequestScreen")
+          break;  
       default:
         navigation.push("MultiDialogScreen")
         break;

@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import DialogScreen from './src/01-DialogScreen';
 import MultiDialogScreen from './src/02-MultiDialogScreen';
 import HomePage from './HomePage';
+import AxiosRequestScreen from './src/03-axios-request';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
@@ -16,6 +17,7 @@ function App(){
         <Stack.Screen name="HomePage" component={HomePage} />
         <Stack.Screen name="DialogScreen" component={DialogScreen} />
         <Stack.Screen name="MultiDialogScreen" component={MultiDialogScreen} />
+        <Stack.Screen name="AxiosRequestScreen" component={AxiosRequestScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
