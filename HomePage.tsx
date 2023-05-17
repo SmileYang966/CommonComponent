@@ -10,10 +10,10 @@ import React, { Component } from 'react'
 import { ToDos,ToListItem } from './src/ToDoList';
 
 const totalData : ToListItem[] = [
-  { id : 1, text : 'Dialog组件1' },
-  { id : 2, text : 'Dialog组件2' },
-  { id : 3, text : 'Dialog组件3' },
-  { id : 4, text : 'Dialog组件4' }
+  { id : 1, text : '单个弹框' },
+  { id : 2, text : '多个弹框' },
+  { id : 3, text : 'Axios网络请求' },
+  { id : 4, text : '视频组件' }
 ]
 
 
@@ -43,7 +43,10 @@ export default class HomePage extends Component {
         break;
       case 2:
           navigation.push("AxiosRequestScreen")
-          break;  
+          break;
+      case 3:
+          navigation.push("ReactVideoScreen")
+          break;        
       default:
         navigation.push("MultiDialogScreen")
         break;
