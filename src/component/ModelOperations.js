@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, DeviceEventEmitter } from 'react-native'
 import React from 'react'
 import RootSiblings from 'react-native-root-siblings';
+ 
 
 let siblings = null;
 function showModel(WrappedComponent) {
@@ -8,6 +9,9 @@ function showModel(WrappedComponent) {
     siblings = new RootSiblings(
       <Pressable style={styles.modelBg} onPress={()=>{
         dismissModel();
+      }} onLayout={(event)=>{
+        console.log("RootSiblings----onLayout is ",event.nativeEvent.layout)
+        DeviceEventEmitter.emit('ModelLayoutChange',event.nativeEvent.layout)
       }}>
         <Pressable>
           {
