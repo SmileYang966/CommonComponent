@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, View,Dimensions, DeviceEventEmitter, TouchableOpacity } from 'react-native'
+import { Pressable, StyleSheet, Text, View, Dimensions, DeviceEventEmitter, TouchableOpacity, Image } from 'react-native'
 import React, { Component, useRef, useState, useEffect } from 'react'
 import { WebView } from 'react-native-webview'
 import Video from 'react-native-video'
 import { dismissModel, showModel } from './component/ModelOperations'
+import videoPlay from './assets/videoPlay.png'
 
 
 const VentilationHaloMp4Url = 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4'
@@ -12,38 +13,47 @@ const marginX = 10;
 const marginY = 10;
 
 
-function VideoView(props){
+function VideoView(props) {
   const videoRef = useRef(null)
-  const { enterFullScreenAction , screenStyle} = props;
-  const [enterFullScreenActionClicked,setEnterFullScreenActionClicked] = useState(false)
-  const [videoStyle,setVideoStyle] = useState(screenStyle);
+  const { enterFullScreenAction, screenStyle } = props;
+  const [pauseValue, setPauseValue] = useState(false);
+  const [showControl, setShowControl] = useState(false);
+  const [enterFullScreenActionClicked, setEnterFullScreenActionClicked] = useState(false)
+  const [videoStyle, setVideoStyle] = useState(screenStyle);
 
-  useEffect(()=>{
+  useEffect(() => {
     // setVideoStyle(screenStyle);
     // 判断横屏，还是竖屏
     const { height, width } = screenStyle;
-    if(height >= width){//竖屏
+    if (height >= width) {//竖屏
       setVideoStyle({
-        width : width,
-        height : width * 0.75
+        width: width,
+        height: width * 0.75
       })
-    }else{//横屏
+    } else {//横屏
       setVideoStyle({
-        width : width,
-        height : height
+        width: width,
+        height: height
       })
     }
-  },[screenStyle])
+  }, [screenStyle])
 
   return (
     // <View style={{width:ScreenWidth, height:ScreenWidth * 0.675 , backgroundColor:'white'}}>
-    <View>
-      <Video source={{uri:VentilationHaloMp4Url}}
+    <TouchableOpacity onPress={() => {
+      console.log("TouchableOpacity777899");
+      setShowControl(!showControl)
+    }}>
+      <Video source={{ uri: VentilationHaloMp4Url }}
         // controls={true}
         // fullscreen={true}
         // allowsExternalPlayback={false}
         // useTextureView={false}
         Focusable={false}
+        paused={pauseValue}
+        onLoad={(res) => {
+          console.log("onLoad is ", JSON.stringify(res));
+        }}
         // resizeMode={'contain'}
         // paused={true}
         // fullscreenOrientation={'landscape'}
@@ -52,47 +62,57 @@ function VideoView(props){
         // }}
         ref={videoRef}
         style={videoStyle}>
-        </Video>
+      </Video>
+      {
+        showControl ?
+          <View style={{ height: 40, width: '100%', backgroundColor: 'red', position: 'absolute', bottom: 0, justifyContent: 'center', }}>
+            <Pressable style={{  }} onPress={() => {
+              console.log("Pressable Me");
+              setPauseValue(!pauseValue);
+            }}>
+              <Image source={videoPlay} />
+            </Pressable>
+            <Pressable onPress={() => {
+              console.log("Pressable sss");
+              enterFullScreenAction && enterFullScreenAction(!enterFullScreenActionClicked);
+              setEnterFullScreenActionClicked(!enterFullScreenActionClicked);
 
-        <View style={{height:40,width:'100%',backgroundColor:'red',position:'absolute',bottom:0,justifyContent:'center'}}>
-          <Pressable onPress={()=>{
-            console.log("Pressable sss");
-            enterFullScreenAction && enterFullScreenAction(!enterFullScreenActionClicked);
-            setEnterFullScreenActionClicked(!enterFullScreenActionClicked);
-
-            }} style={{height:40,backgroundColor:'blue',position:'absolute',right:0,justifyContent:'center'}}>
-            <Text>{enterFullScreenActionClicked ? '退出全屏' : '全屏播放'}</Text>
-          </Pressable> 
-        </View>  
-    </View>
+            }} style={{ height: 40, backgroundColor: 'gray', position: 'absolute', right: 0, justifyContent: 'center', paddingHorizontal: 10 }}>
+              <Text>{enterFullScreenActionClicked ? '退出全屏' : '全屏播放'}</Text>
+            </Pressable>
+          </View>
+          :
+          <View />
+      }
+    </TouchableOpacity>
   );
 }
 
-function FullScreen(props){
+function FullScreen(props) {
 
-  const [screenStyle,setScreenStyle] = useState({width:ScreenWidth,height:ScreenHeight})
-  const [enterFullScreenActionClicked,setEnterFullScreenActionClicked] = useState(false)
+  const [screenStyle, setScreenStyle] = useState({ width: ScreenWidth, height: ScreenHeight })
+  const [enterFullScreenActionClicked, setEnterFullScreenActionClicked] = useState(false)
 
   useEffect(() => {
-    DeviceEventEmitter.addListener("ModelLayoutChange",(layout)=>{
-      console.log("aaabbb ccccddd ",layout);
-      setScreenStyle({width:layout.width,height:layout.height});
+    DeviceEventEmitter.addListener("ModelLayoutChange", (layout) => {
+      console.log("aaabbb ccccddd ", layout);
+      setScreenStyle({ width: layout.width, height: layout.height });
     })
   }, [])
-  
+
 
   const videoLayout = (event) => {
-    console.log("FullScreen---",event.nativeEvent.layout)
+    console.log("FullScreen---", event.nativeEvent.layout)
   }
 
   return (
-    <TouchableOpacity style={{...screenStyle,flex:1,justifyContent:'center', backgroundColor : enterFullScreenActionClicked ? 'black' : 'transparent' }} onLayout={videoLayout} onPress={()=>{
+    <TouchableOpacity style={{ ...screenStyle, flex: 1, justifyContent: 'center', backgroundColor: enterFullScreenActionClicked ? 'black' : 'transparent' }} onLayout={videoLayout} onPress={() => {
       dismissModel();
     }}>
-      <VideoView enterFullScreenAction={(result)=>{
+      <VideoView enterFullScreenAction={(result) => {
         console.log("enterFullScreenAction");
         setEnterFullScreenActionClicked(result)
-      }} screenStyle={screenStyle}/>
+      }} screenStyle={screenStyle} />
     </TouchableOpacity>
   );
 }
@@ -100,12 +120,12 @@ function FullScreen(props){
 
 export default class ReactVideoScreen extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.state = {
-      isFullScreen : false,
-      layout : {}
+      isFullScreen: false,
+      layout: {}
     }
   }
 
@@ -116,22 +136,22 @@ export default class ReactVideoScreen extends Component {
     });
   }
 
-  onLoadEnd(e){
+  onLoadEnd(e) {
     let data = {
       version: 'v2.0.0'
     }
     this.webView && this.webView.postMessage(JSON.stringify(data));
   }
 
-  onBuffer(e){
+  onBuffer(e) {
 
   }
 
-  videoError(error){
+  videoError(error) {
 
   }
 
-  buttonClick(){
+  buttonClick() {
     console.log("buttonClick");
     // showModel(<VideoView/>);
 
@@ -140,14 +160,14 @@ export default class ReactVideoScreen extends Component {
     // })
 
     showModel(
-      <FullScreen/>
+      <FullScreen />
     )
   }
 
-  layoutEvent(event){
-    console.log('弹窗尺寸11', event.nativeEvent.layout.width, event.nativeEvent.layout.height,"aaab",event.nativeEvent.layout)
+  layoutEvent(event) {
+    console.log('弹窗尺寸11', event.nativeEvent.layout.width, event.nativeEvent.layout.height, "aaab", event.nativeEvent.layout)
     this.setState({
-      layout : event.nativeEvent.layout
+      layout: event.nativeEvent.layout
     })
   }
 
@@ -169,21 +189,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  buttonStyle : {
-    width : 150,
-    height : 40,
-    backgroundColor : 'gray',
-    marginTop : 50,
-    alignSelf : 'center',
-    justifyContent:'center',
-    alignItems : 'center'
+  buttonStyle: {
+    width: 150,
+    height: 40,
+    backgroundColor: 'gray',
+    marginTop: 50,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  videoStyle : {
-    width : '100%',
-    height : '100%'
+  videoStyle: {
+    width: '100%',
+    height: '100%'
   },
-  videoStyle1 : {
-    width : '100%',
-    height : 250,
+  videoStyle1: {
+    width: '100%',
+    height: 250,
   }
 })
