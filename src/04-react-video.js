@@ -14,8 +14,26 @@ const marginY = 10;
 
 function VideoView(props){
   const videoRef = useRef(null)
-  const { enterFullScreenAction } = props;
+  const { enterFullScreenAction , screenStyle} = props;
   const [enterFullScreenActionClicked,setEnterFullScreenActionClicked] = useState(false)
+  const [videoStyle,setVideoStyle] = useState(screenStyle);
+
+  useEffect(()=>{
+    // setVideoStyle(screenStyle);
+    // 判断横屏，还是竖屏
+    const { height, width } = screenStyle;
+    if(height >= width){//竖屏
+      setVideoStyle({
+        width : width,
+        height : width * 0.75
+      })
+    }else{//横屏
+      setVideoStyle({
+        width : width,
+        height : height
+      })
+    }
+  },[screenStyle])
 
   return (
     // <View style={{width:ScreenWidth, height:ScreenWidth * 0.675 , backgroundColor:'white'}}>
@@ -33,17 +51,19 @@ function VideoView(props){
         //   console.log(progress.currentTime,progress.playableDuration,progress.seekableDuration);
         // }}
         ref={videoRef}
-        style={styles.videoStyle}>
+        style={videoStyle}>
         </Video>
 
-        <Pressable onPress={()=>{
-          console.log("Pressable sss");
-          enterFullScreenAction && enterFullScreenAction(!enterFullScreenActionClicked);
-          setEnterFullScreenActionClicked(!enterFullScreenActionClicked);
+        <View style={{height:40,width:'100%',backgroundColor:'red',position:'absolute',bottom:0,justifyContent:'center'}}>
+          <Pressable onPress={()=>{
+            console.log("Pressable sss");
+            enterFullScreenAction && enterFullScreenAction(!enterFullScreenActionClicked);
+            setEnterFullScreenActionClicked(!enterFullScreenActionClicked);
 
-        }} style={{height:40,backgroundColor:'red',position:'absolute',right:100,bottom:0,justifyContent:'center'}}>
-          <Text>Hello Click Me</Text>
-        </Pressable>   
+            }} style={{height:40,backgroundColor:'blue',position:'absolute',right:0,justifyContent:'center'}}>
+            <Text>{enterFullScreenActionClicked ? '退出全屏' : '全屏播放'}</Text>
+          </Pressable> 
+        </View>  
     </View>
   );
 }
@@ -72,7 +92,7 @@ function FullScreen(props){
       <VideoView enterFullScreenAction={(result)=>{
         console.log("enterFullScreenAction");
         setEnterFullScreenActionClicked(result)
-      }}/>
+      }} screenStyle={screenStyle}/>
     </TouchableOpacity>
   );
 }
@@ -164,6 +184,6 @@ const styles = StyleSheet.create({
   },
   videoStyle1 : {
     width : '100%',
-    height : 200,
+    height : 250,
   }
 })
